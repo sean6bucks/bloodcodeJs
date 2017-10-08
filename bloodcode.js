@@ -26,18 +26,21 @@ function resetCode() {
 
 var createStyleText = function( styleDefs ) {
 	var st = '';
-	for (var selector in styleDefs) {
+	for ( var selector in styleDefs ) {
 		st += '\n' + selector + ' {';
 		var props = styleDefs[selector];
-		for (var k in props) {
-			st += k + ':' + props[k] + ';';
+		for ( var k in props ) {
+			if ( props[k] )
+				st += k + ':' + props[k] + ';';
+			else
+				st += k;
 		}
 		st += '}';
 	}
 	return st;
 };
 
-var attachStyles = function() {
+function attachStyles() {
 	var cssStyles = {
 		'@font-face': {
 			'font-family': '"MKfont"',
@@ -48,6 +51,17 @@ var attachStyles = function() {
 		},
 		'body, body *': {
 			'font-family': '"MKfont" !important',
+			'cursor': 'none'
+		},
+		'#bloody-cursor' : {
+			'position': 'fixed',
+			'height': '32px',
+			'width': '16px',
+			'background': 'url( "BloodyCursor.png" ) left top',
+			'animation': 'play 0.8s steps(4) infinite',
+		},
+		'@keyframes play': {
+		   '100% { background-position: -64px; }' : ''
 		}
 	};
 	// BUILD CSS CONTENT
@@ -66,12 +80,28 @@ var attachStyles = function() {
 	} else {
 		styleEl.textContent = styleText;
 	}
-}
+};
+
+function attachCursor() {
+	var cursorEl = document.createElement( 'div' );
+	cursorEl.id = 'bloody-cursor';
+	document.body.appendChild( cursorEl );
+
+	function positionCursor( evt ) {
+		var x = evt.clientX;
+		var y = evt.clientY;
+		
+		cursorEl.style.left = x + 'px';
+		cursorEl.style.top = y + 'px';
+	};
+	addEvent( window, "mousemove", positionCursor );
+};
 
 function activate() {
 	// ATTACH BLOODCODE CSS TO DOM
 	if ( !document.getElementById( 'mk-styles' ) ) {
 		attachStyles();
+		attachCursor();
 	}
 };
 
